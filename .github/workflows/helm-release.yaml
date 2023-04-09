@@ -1,4 +1,5 @@
 name: Release helm chart
+
 on:
   push:
     branches: [ "main" ]
@@ -8,6 +9,10 @@ on:
 jobs:
   release-helm:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: none
 
     steps:
       - uses: actions/checkout@v3
@@ -20,7 +25,7 @@ jobs:
 
       - name: login to ghcr.io using helm
         run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io/michaelvl/cosign-oci-poc-helm --username ${{ github.repository_owner }} --password-stdin
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io/${{ github.repository }}-helm --username ${{ github.repository_owner }} --password-stdin
 
       - name: save helm chart to local registry
         run: |
@@ -28,4 +33,41 @@ jobs:
 
       - name: publish chart to ghcr.io
         run: |
-          helm push cosign-oci-poc-helm-*.tgz oci://ghcr.io/michaelvl | tee helm-push-out.txt
+          VERSION=$(cat charts/cosign-oci-poc/Chart.yaml | awk -F "[, ]+" '/version/{print $NF}')
+          helm push "cosign-oci-poc-helm-$VERSION.tgz" oci://ghcr.io/michaelvl 2>&1 | tee helm-push-out.txt
+
+      - name: Chart meta
+        id: meta
+        run: |
+          DIGEST=$(cat helm-push-out.txt | awk -F "[, ]+" '/Digest/{print $NF}')
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+          CHART=$(echo ghcr.io/${{ github.repository }}-helm | tr '[:upper:]' '[:lower:]')
+          echo "chart=$CHART@$DIGEST" >> $GITHUB_OUTPUT
+
+    outputs:
+      digest: ${{ steps.meta.outputs.digest }}
+      chart: ${{ steps.meta.outputs.chart }}
+
+  sign-helm:
+    needs: release-helm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: none
+      packages: write
+      id-token: write
+
+    steps:
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - uses: sigstore/cosign-installer@c3667d99424e7e6047999fb6246c0da843953c65 # tag=v3.0.1
+
+    - name: Sign chart
+      run: cosign sign --yes ${{ needs.release-helm.outputs.chart }}
+
+    - name: Verify signature
+      run: cosign verify --certificate-identity 'https://github.com/${{ github.repository }}/.github/workflows/helm-release.yaml@refs/heads/main' --certificate-oidc-issuer https://token.actions.githubusercontent.com ${{ needs.release-helm.outputs.chart }}
