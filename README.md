@@ -3,6 +3,11 @@
 This repository contain a PoC of secure handling of container and Helm
 chart artifacts.
 
+The PoC revolves around a simple HTTP service, which is packaged into
+a container and made deployable to Kubernetes through a Helm
+chart. **Both the container and Helm chart artifacts are signed using
+[Cosign](https://github.com/sigstore/cosign)**.
+
 ## First Principles
 
 ### Keep the Repository Pristine
