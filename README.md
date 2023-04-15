@@ -35,6 +35,14 @@ signing and verifying signatures on artifacts.
 
 ### Artifacts are Only Referenced Using Digests, Never SemVer Tags
 
+### Base Images are Verified
+
+For this specific example project:
+
+```
+cosign verify gcr.io/distroless/static-debian11:latest --certificate-oidc-issuer https://accounts.google.com  --certificate-identity keyless@distroless.iam.gserviceaccount.com
+```
+
 See [Why We Should Use `latest` Tag on Container Images](https://medium.com/@michael.vittrup.larsen/why-we-should-use-latest-tag-on-container-images-fc0266877ab5)
 
 ## Verifying Artifacts
@@ -43,12 +51,12 @@ Container:
 
 ```
 export IMAGE_DIGEST=sha256:fc84c7d1b142d12a484377a828d42e360a81d40eeff7d3dfaa539877fb4c74d0
-cosign verify --certificate-identity https://github.com/michaelvl/cosign-oci-poc/.github/workflows/build.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com ghcr.io/michaelvl/cosign-oci-poc@$IMAGE_DIGEST
+cosign verify --certificate-identity https://github.com/michaelvl/cosign-oci-poc/.github/workflows/build.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com ghcr.io/michaelvl/cosign-oci-poc@$IMAGE_DIGEST | jq .
 ```
 
 Helm Chart:
 
 ```
 export CHART_DIGEST=sha256:8d7648e56a2d12c4cda2645f2e63b3c820f2f8789b46f887f1a1ebdcdf9ebbf7
-cosign verify --certificate-identity https://github.com/michaelvl/cosign-oci-poc/.github/workflows/helm-release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com ghcr.io/michaelvl/cosign-oci-poc-helm@$CHART_DIGEST
+cosign verify --certificate-identity https://github.com/michaelvl/cosign-oci-poc/.github/workflows/helm-release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com ghcr.io/michaelvl/cosign-oci-poc-helm@$CHART_DIGEST | jq .
 ```

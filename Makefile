@@ -30,7 +30,7 @@ ALL_PLATFORMS ?= linux/amd64 linux/arm linux/arm64 linux/ppc64le linux/s390x
 
 # The "FROM" part of the Dockerfile.  This should be a manifest-list which
 # supports all of the platforms listed in ALL_PLATFORMS.
-BASE_IMAGE ?= gcr.io/distroless/static
+BASE_IMAGE ?= gcr.io/distroless/static-debian11:latest
 
 # Where to push the docker images.
 REGISTRY ?= ghcr.io/michaelvl
