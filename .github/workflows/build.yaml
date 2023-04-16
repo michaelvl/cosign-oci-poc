@@ -72,7 +72,7 @@ jobs:
       run: cosign sign --yes ${{ needs.build.outputs.image }}
 
   verify:
-    needs: sign
+    needs: [ build, sign ]
     runs-on: ubuntu-latest
 
     steps:

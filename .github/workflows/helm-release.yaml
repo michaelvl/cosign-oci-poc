@@ -77,7 +77,7 @@ jobs:
       run: cosign sign --yes -a "chartVersion=${{ needs.release-helm.outputs.chartVersion }}" ${{ needs.release-helm.outputs.chart }}
 
   verify-helm:
-    needs: sign-helm
+    needs: [ release-helm, sign-helm ]
     runs-on: ubuntu-latest
 
     steps:
