@@ -66,7 +66,7 @@ jobs:
     - uses: sigstore/cosign-installer@c3667d99424e7e6047999fb6246c0da843953c65 # tag=v3.0.1
 
     - name: Sign container
-      run: cosign sign --yes -a "repository=${{ github.repository }}" -a "ref=${{ github.ref }}" -a "sha=${{ github.sha }}" ${{ needs.build.outputs.image }}
+      run: cosign sign --yes ${{ needs.build.outputs.image }}
 
     - name: Verify signature
       run: cosign verify --certificate-identity 'https://github.com/${{ github.repository }}/.github/workflows/build.yaml@refs/heads/main' --certificate-oidc-issuer https://token.actions.githubusercontent.com ${{ needs.build.outputs.image }}

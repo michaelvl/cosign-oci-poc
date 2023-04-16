@@ -32,9 +32,11 @@ jobs:
           helm package charts/cosign-oci-poc
 
       - name: publish chart to ghcr.io
+        id: chart-push
         run: |
           VERSION=$(cat charts/cosign-oci-poc/Chart.yaml | awk -F "[, ]+" '/version/{print $NF}')
           helm push "cosign-oci-poc-helm-$VERSION.tgz" oci://ghcr.io/michaelvl 2>&1 | tee helm-push-out.txt
+          echo "chartVersion=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Chart meta
         id: meta
@@ -45,6 +47,7 @@ jobs:
           echo "chart=$CHART@$DIGEST" >> $GITHUB_OUTPUT
 
     outputs:
+      chartVersion: ${{ steps.chart-push.outputs.chartVersion }}
       digest: ${{ steps.meta.outputs.digest }}
       chart: ${{ steps.meta.outputs.chart }}
 
@@ -67,7 +70,7 @@ jobs:
     - uses: sigstore/cosign-installer@c3667d99424e7e6047999fb6246c0da843953c65 # tag=v3.0.1
 
     - name: Sign chart
-      run: cosign sign --yes -a "repository=${{ github.repository }}" -a "ref=${{ github.ref }}" -a "sha=${{ github.sha }}" ${{ needs.release-helm.outputs.chart }}
+      run: cosign sign --yes -a "chartVersion=${{ needs.release-helm.outputs.chartVersion }}" ${{ needs.release-helm.outputs.chart }}
 
     - name: Verify signature
       run: cosign verify --certificate-identity 'https://github.com/${{ github.repository }}/.github/workflows/helm-release.yaml@refs/heads/main' --certificate-oidc-issuer https://token.actions.githubusercontent.com ${{ needs.release-helm.outputs.chart }}
