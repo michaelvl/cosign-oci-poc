@@ -50,13 +50,14 @@ See [Why We Should Use `latest` Tag on Container Images](https://medium.com/@mic
 Container:
 
 ```
-export IMAGE_DIGEST=sha256:fc84c7d1b142d12a484377a828d42e360a81d40eeff7d3dfaa539877fb4c74d0
-cosign verify --certificate-identity https://github.com/michaelvl/cosign-oci-poc/.github/workflows/build.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com ghcr.io/michaelvl/cosign-oci-poc@$IMAGE_DIGEST | jq .
+export IMAGE_DIGEST=sha256:617b26448aa798a3981ac2053189c0ea11cf2070d685b9d78a507299dc96ea84
+cosign verify --certificate-identity-regexp https://github.com/michaelvl/cosign-oci-poc/.github/workflows/build.yaml@refs/.* --certificate-oidc-issuer https://token.actions.githubusercontent.com ghcr.io/michaelvl/cosign-oci-poc@$IMAGE_DIGEST | jq .
 ```
 
 Helm Chart:
 
 ```
-export CHART_DIGEST=sha256:8d7648e56a2d12c4cda2645f2e63b3c820f2f8789b46f887f1a1ebdcdf9ebbf7
-cosign verify --certificate-identity https://github.com/michaelvl/cosign-oci-poc/.github/workflows/helm-release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com ghcr.io/michaelvl/cosign-oci-poc-helm@$CHART_DIGEST | jq .
+export CHART_DIGEST=sha256:a0f685b1df374ae4d4e5d032c36fd64aada28bf1cf9f614591fef4a50c90cec6
+export CHART_SEMVER_EXPECTED=0.1.0
+cosign verify --certificate-identity-regexp https://github.com/michaelvl/cosign-oci-poc/.github/workflows/helm-release.yaml@refs/.* --certificate-oidc-issuer https://token.actions.githubusercontent.com -a "chartVersion=$CHART_SEMVER_EXPECTED" ghcr.io/michaelvl/cosign-oci-poc-helm@$CHART_DIGEST | jq .
 ```
