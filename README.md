@@ -50,8 +50,9 @@ See [Why We Should Use `latest` Tag on Container Images](https://medium.com/@mic
 Container:
 
 ```
-export IMAGE_DIGEST=sha256:617b26448aa798a3981ac2053189c0ea11cf2070d685b9d78a507299dc96ea84
-cosign verify --certificate-identity-regexp https://github.com/michaelvl/cosign-oci-poc/.github/workflows/build.yaml@refs/.* --certificate-oidc-issuer https://token.actions.githubusercontent.com ghcr.io/michaelvl/cosign-oci-poc@$IMAGE_DIGEST | jq .
+export IMAGE_DIGEST=sha256:62cfb67608e6b5665379409220c1f340e91392c4a419449085fefbff09241da2
+export IMAGE_SEMVER_EXPECTED=0.4.0
+cosign verify --certificate-identity-regexp https://github.com/michaelvl/cosign-oci-poc/.github/workflows/build.yaml@refs/.* --certificate-oidc-issuer https://token.actions.githubusercontent.com -a "imageRef=refs/tags/$IMAGE_SEMVER_EXPECTED"  ghcr.io/michaelvl/cosign-oci-poc@$IMAGE_DIGEST | jq .
 ```
 
 Helm Chart:
