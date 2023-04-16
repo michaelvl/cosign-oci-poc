@@ -51,7 +51,7 @@ Container:
 
 ```
 export IMAGE_DIGEST=sha256:62cfb67608e6b5665379409220c1f340e91392c4a419449085fefbff09241da2
-export IMAGE_SEMVER_EXPECTED=0.4.0
+export IMAGE_SEMVER_EXPECTED=0.5.0
 cosign verify --certificate-identity-regexp https://github.com/michaelvl/cosign-oci-poc/.github/workflows/build.yaml@refs/.* --certificate-oidc-issuer https://token.actions.githubusercontent.com -a "imageRef=refs/tags/$IMAGE_SEMVER_EXPECTED"  ghcr.io/michaelvl/cosign-oci-poc@$IMAGE_DIGEST | jq .
 ```
 
