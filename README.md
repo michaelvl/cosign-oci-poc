@@ -35,6 +35,14 @@ signing and verifying signatures on artifacts.
 
 ### Artifacts are Only Referenced Using Digests, Never SemVer Tags
 
+See [Why We Should Use `latest` Tag on Container Images](https://medium.com/@michael.vittrup.larsen/why-we-should-use-latest-tag-on-container-images-fc0266877ab5)
+
+The GitHub workflows in this repo adds an annotation to the signature
+with the SemVer of the artifact. However, it is important to remember,
+that such versioning can be changed (e.g. tags can be moved), and the
+annotation only guarantees, that e.g. a SemVer tag was associated with
+the artifact version at build time.
+
 ### Base Images are Verified
 
 For this specific example project:
@@ -43,7 +51,10 @@ For this specific example project:
 cosign verify gcr.io/distroless/static-debian11:latest --certificate-oidc-issuer https://accounts.google.com  --certificate-identity keyless@distroless.iam.gserviceaccount.com
 ```
 
-See [Why We Should Use `latest` Tag on Container Images](https://medium.com/@michael.vittrup.larsen/why-we-should-use-latest-tag-on-container-images-fc0266877ab5)
+### Additional Documents are Signed
+
+- SBOMS
+- Attestations
 
 ## Verifying Artifacts
 
